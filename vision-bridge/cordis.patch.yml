@@ -1,0 +1,3 @@
+- insert:
+    - id: vision-bridge
+      name: '@local/dsh-vision-bridge'

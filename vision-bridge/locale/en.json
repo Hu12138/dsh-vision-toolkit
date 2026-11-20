@@ -1,0 +1,4 @@
+{
+  "title": "Vision Bridge",
+  "description": "Replace image blocks with GLM-4V analysis text before the upstream model call"
+}
