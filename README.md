@@ -20,28 +20,41 @@
 
 ## 安装
 
-前置：Node.js ≥ 20、一个可用的 DSH profile、[智谱开放平台免费 API Key](https://open.bigmodel.cn/usercenter/apikeys)（GLM-4V-Flash 免费，有速率限制）。
+前置：Node.js ≥ 20、已安装 `dsh` CLI、[智谱开放平台免费 API Key](https://open.bigmodel.cn/usercenter/apikeys)（GLM-4V-Flash 免费，有速率限制）。上游模型按 DSH 老规矩在 GUI 设置里配置，与本仓库无关。
 
-### 1. 浏览器插件
+### 一键安装（推荐）
+
+```bash
+git clone https://github.com/Hu12138/dsh-vision-toolkit
+cd dsh-vision-toolkit
+bash setup.sh                 # 浏览器 + 视觉 + vision-bridge
+# 可选: bash setup.sh --no-browser  只要视觉能力
+```
+
+脚本会：自动创建 profile（如不存在）→ 安装 `glm4v-mcp`、`vision-bridge`（及可选浏览器插件）→ 写入 `cordis.patch.yml`（只含本仓库相关条目）→ 提示下一步。全程只问智谱 Key 一个必填项。
+
+### 手动安装
+
+#### 1. 浏览器插件（可选）
 
 ```bash
 dsh plugin --profile web add "@deepseek-ai/dsh-browser-use@0.2.1-rc.2" \
   "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp@0.2.1-rc.2"
 ```
 
-### 2. 视觉 MCP 工具
+#### 2. 视觉 MCP 工具
 
 ```bash
-npm i glm4v-mcp          # 建议装在工作区，避免每次 npx 下载
+dsh plugin --profile web add glm4v-mcp   # 装进 profile，.bin 路径稳定
 ```
 
-### 3. vision-bridge 插件
+#### 3. vision-bridge 插件
 
 ```bash
 dsh plugin --profile web add /path/to/dsh-vision-toolkit/vision-bridge
 ```
 
-### 4. 配置（编辑 `~/.dsh/profiles/web/cordis.patch.yml`）
+#### 4. 配置（编辑 `~/.dsh/profiles/web/cordis.patch.yml`）
 
 ```yaml
 - insert:
@@ -73,26 +86,11 @@ dsh plugin --profile web add /path/to/dsh-vision-toolkit/vision-bridge
         model: glm-4v-flash
 ```
 
-同时给上游模型声明图片输入（准入需要，实际图片会被 vision-bridge 替换掉）：
-
-```yaml
-- id: llm-pi-ai
-  name: "@deepseek-ai/dsh-llm-pi-ai"
-  config:
-    providers:
-      your-provider:
-        apiKeyEnv: YOUR_API_KEY
-        api: openai-completions
-        baseURL: http://127.0.0.1:8001/v1
-        models:
-          - id: your-model
-            name: your-model
-            input: [text, image]     # 声明图片输入，让粘贴图片通过准入
-```
-
+> 提示：想在聊天框**粘贴图片**，给对应模型声明 `input: [text, image]`（GUI 模型设置里配置，准入需要；图片实际会被 vision-bridge 替换，不会上行到模型）。
+>
 > 注意：一次只挂载一个浏览器 provider（playwright / chrome-devtools 二选一）。
 
-### 5. 生效
+#### 5. 生效
 
 **重启 DSH GUI 或新建会话**——插件在会话创建/恢复时装载。
 
